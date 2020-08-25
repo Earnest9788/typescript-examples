@@ -148,5 +148,64 @@ a = ro as number[];
 
 /******************************
  * Title: 4. Excess Property Checks
+ * Desc: 초과 속성 오류를 우회하는 방법을 알아본다.
+ *****************************/
+
+/**
+ * 'optional property'에서 살펴본 내용에 따르면 아래의 코드는 정상적으로 작동해야 한다.
+ * 하지만 타입스크립트에서 '객체 리터럴'은 다른 변수에 할당하거나 인자로 전달될 때 특별하게 다뤄지며,
+ * 과도한 타입 검사를 받는다. 아래의 예제에서는 대상이 되는 인터페이스에 colour라는 속성이 없기 때문에
+ * 오류가 발생하게 된다.
+ */
+interface SomeConfig {
+    color?: string;
+    width?: number;
+}
+
+function createSomething(config: SomeConfig): { color: string; area: number } {
+    return { color: config.color || 'red', area: config.width || 20 };
+}
+
+let something1 = createSomething({ colour: 'red', width: 100 }); // FAIl
+
+/**
+ * 이러한 문제를 피하는 가장 쉬운 방법은 type assertion을 사용하는 것이다.
+ */
+let something2 = createSomething({ width: 100, opacity: 0.5 } as SquareConfig);
+
+/**
+ * 하지만 객체가 추가적인 속성을 가질 수 있는 경우라면 문자열 인덱스 시그니쳐를 사용하는 것이 더 좋은 방법일 수 있다.
+ * 아래의 예제에서 SquareConfig는 얼마든지 추가 속성을 가질 수 있으며, color, width 속성을 제외하면 어떤 타입이든 허용된다.
+ */
+interface SomeConfig2 {
+    color?: string;
+    width?: number;
+    [propName: string]: any;
+}
+
+function createSomething2(config: SomeConfig2): { color: string; area: number } {
+    return { color: config.color || 'red', area: config.width || 20 };
+}
+
+let something3 = createSomething2({ colour: 'red', width: 100 });
+
+/**
+ * 마지막 방법으로는 객체를 다른 변수에 할당하는 방법이 있다.
+ * 다른 변수에 할당하여 전달한다면 객체 리터럴을 직접 전달한 것이 아니기 때문에
+ * 엄격한 타입 검사를 피할 수 있다.
+ */
+let squareOptions = { colour: 'red' };
+let something4 = createSomething2(squareOptions);
+
+/**
+ * 앞선 예제와 같이 간단한 코드의 경우에는 인터페이스를 직접 수정하는 것이 바람직한 방식이다.
+ * 물론 복잡한 메서드와 속성을 갖고 있는 객체를 다룰 때는 위의 여러 우회 방식을 사용해야 할 수 도 있다.
+ * 하지만 대부분의 경우 초과된 속성 확인 때문에 발생하는 오류는 실제로 버그인 경우가 많다.
+ */
+
+
+
+/******************************
+ * Title: 5. Function Types
  * Desc: 
  *****************************/
