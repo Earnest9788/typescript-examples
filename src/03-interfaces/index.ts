@@ -207,5 +207,61 @@ let something4 = createSomething2(squareOptions);
 
 /******************************
  * Title: 5. Function Types
+ * Desc: 인터페이스로 함수의 타입을 기술할 수 있다.
+ *****************************/
+
+/**
+ * 인터페이스로 함수의 타입을 기술하기 위해서 콜 시그니처를 사용한다.
+ * 콜 시그니쳐는 매개변수와 반환값의 타입 만을 기술한 함수 선언이다.
+ * 물론 각 매개변수의 타입도 필요하다.
+ */
+interface SearchFunc {
+    (source: string, subString: string): boolean;
+}
+
+let mySearch: SearchFunc;
+
+mySearch = function(source: string, subString: string) {
+    let result = source.search(subString);
+    return result > -1;
+}
+
+/**
+ * 파라미터의 타입만 정확하게 전달한다면 파라미터의 이름이 달라도 상관없다.
+ */
+let mySearch2: SearchFunc;
+
+mySearch2 = function(src: string, sub: string) {
+    let result = src.search(sub);
+    return result > -1;
+}
+
+/**
+ * 각 매개변수는 대응되는 인터페이스의 속성에 맞춰 한번에 하나씩 검사된다.
+ * 파라미터의 타입을 지정하지 않는다고 하더라도 타입스크립트는 인터페이스를 참조하여 
+ * 자동으로 해당 파라미터의 타입과 반환 타입을 추론할 수 있다. 
+ */
+let mySearch3: SearchFunc;
+
+mySearch3 = function (src, sub) {
+    let result = src.search(sub);
+    return result > -1;
+}
+
+/**
+ * 다음의 예제에서는 인터페이스의 반환 타입과 실제 반환 값의 타입이 불일치하기 때문에
+ * 에러가 발생한다.
+ */
+let mySearch4: SearchFunc;
+
+mySearch4 = function (src, sub) {
+    let result = src.search(sub);
+    return "string"; // FAIL
+}
+
+
+
+/******************************
+ * Title: 6. Indexable Types
  * Desc: 
  *****************************/
