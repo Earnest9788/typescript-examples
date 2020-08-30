@@ -344,3 +344,118 @@ interface ReadonlyStringArray {
 
 let myReadonlyArray: ReadonlyStringArray = ["Alice", "Bob"];
 myReadonlyArray[2] = "Mallory"; // FAIL
+
+
+
+/******************************
+ * Title: 7. Class Types
+ * Desc: 
+ *****************************/
+
+/**
+ * - 인터페이스 주입
+ * Java나 C#과 같은 언어에서 인터페이스는 주로 클래스가 특정 기능을 수행하도록 강제하는 역할을 하는데
+ * 이는 타입스크립트에서도 마찬가지이다.
+ */
+interface ClockInterface {
+    currentTime: Date;
+}
+
+class Clock implements ClockInterface {
+    currentTime: Date = new Date();
+    constructor(h: number, m: number) {}
+}
+
+/**
+ * 인터페이스를 사용해서 특정 메서드를 반드시 구현하도록 강제할 수도 있다.
+ */
+interface ClockInterface2 {
+    currentTime: Date;
+    setTime(d: Date): void;
+}
+
+class Clock2 implements ClockInterface2 {
+    currentTime: Date = new Date();
+    setTime(d: Date) {
+        this.currentTime = d;
+    }
+    constructor(h: number, m: number) {}
+}
+
+/**
+ * 타입스크립트에서 인터페이스는 public과 private 영역 모두를 다루지 않으며 오직 public 측면의 영역만을 다룬다.
+ * 이러한 특성은 인터페이스를 클래스의 인스턴스의 private 영역에 특정 타입의 속성이 있는지를 체크하기 위한 도구로 사용하는 것을 금한다.
+ */
+
+/**
+ * - static과 인스턴스의 차이
+ * 클래스는 "static 타입"과 "인스턴스 타입" 2가지 영역을 갖는다.
+ * 다음의 예제를 보면 생성자를 정의한 인터페이스를 클래스에 주입한다면 에러가 발생한다는 것을 알 수 있다.
+ * 이는 클래스에 인터페이스가 주입될 때 '인스턴스 영역'만이 체크되기 때문이다. 물론 생성자는 'static 영역'이다.
+ * 따라서 인터페이스를 통해서 생성자의 타입을 주입하려고 한다면 에러가 발생한다. 
+ */
+interface ClockConstructor {
+    new (hour: number, minute: number);
+}
+
+class NewClock implements ClockConstructor { // FAIL
+    currentTime: Date;
+    constructor(h: number, m: number) {}
+}
+
+/**
+ * 대신에 클래스의 static 영역을 직접적으로 다룰 필요가 있다. 
+ * 다음의 예제에서는 AClockConstructor 인터페이스를 클래스에 주입하는 대신에 
+ * createClock 함수의 파라미터 타입으로 할당해서 직접적으로 해당 파라미터로 들어오는
+ * DigitalClock 클래스와 타입 체크를 진행한다.
+ */
+interface AClockConstructor {
+    new (hour: number, minute: number): AClockInterface;
+}
+
+interface AClockInterface {
+    tick(): void;
+}
+
+function createClock(
+    ctor: AClockConstructor,
+    hour: number,
+    minute: number,
+): AClockInterface {
+    return new ctor(hour, minute);
+}
+
+class DigitalClock implements AClockInterface {
+    constructor(h: number, m: number) {}
+    tick() {
+        console.log("beep beep");
+    }
+}
+
+class AnalogClock implements AClockInterface {
+    constructor(h: number, m: number) {}
+    tick() {
+        console.log("tick tock");
+    }
+}
+
+let digital = createClock(DigitalClock, 12, 17);
+let analog = createClock(AnalogClock, 7, 32);
+
+/**
+ * 더 간단한 방법으로 다음의 클래스 표현식을 사용할 수 있다.
+ */
+interface BClockConstructor {
+    new (hour: number, minute: number);
+}
+
+interface BClockInterface {
+    tick();
+}
+
+const BClock: BClockConstructor = class BClock implements BClockInterface {
+    constructor(h: number, m: number) {}
+    tick() {
+        console.log("beep beep");
+    }
+}
