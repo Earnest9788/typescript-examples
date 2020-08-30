@@ -265,3 +265,82 @@ mySearch4 = function (src, sub) {
  * Title: 6. Indexable Types
  * Desc: 
  *****************************/
+
+/**
+ * 인터페이스는 앞서 함수의 타입을 정의했던 것과 유사한 방식으로 객체의 속성 접근자를 정의할 수 있다.
+ * 이를 "Indexable Types"라고 하며, 접근하고자 하는 속성의 리턴 타입과 함께 해당 속성의 
+ * 접근자 타입을 지정할 수 있다. 다음의 예제를 살펴보자.
+ */
+interface StringArray {
+    [index: number]: string;
+}
+
+let myArray: StringArray;
+myArray = ["Bob", "Fred"];
+
+let myStr: string = myArray[0];
+
+/**
+ * 위의 예제에서 인덱스 시그니쳐를 갖는 인터페이스가 있다.
+ * 이 인덱스 시그니쳐는 해당 배열이 숫자를 통해서 인덱싱 되며,
+ * 문자열 값을 리턴할 것이라는 사실을 알려준다.
+ */
+
+/**
+ * 지원되는 인덱스 시그니쳐 타입으로는 '문자열'과 '숫자' 2가지가 있다. 이 2가지를 모두 지원할 수는 있지만,
+ * 숫자 인덱서를 사용하는 경우 리턴 타입은 문자열 인덱서의 리턴 타입의 서브 타입이어야 한다.
+ * 이는 숫자로 인덱싱하는 경우 문자열로 변환되어 객체에 적용되는 자바스크립트의 특성(ex 숫자 100은 "100"으로 인덱싱이 된다.) 
+ * 때문에 생긴 제약이다.
+ * 아래의 경우를 보자. notOkay[0]으로 접근할 경우 타입스크립트는 'Animal'타입의 값이
+ * 리턴될 것이라고 생각할 것이다. 하지만 자바스크립트는 notOkay['0']으로 처리를 하기 때문에
+ * 실제 리턴타입이 'Dog'가 된다. 그 결과 리턴 타입이 서브타입의 관계가 아니라면 할당을 할 수가 없으므로 에러가 발생한다.
+ */
+interface Animal {
+    name: string;
+}
+
+interface Dog extends Animal {
+    breed: string;
+}
+
+interface NotOkay {
+    [x: number]: Animal; // FAIL
+    [x: string]: Dog;
+}
+
+const notOkay: NotOkay = { // FAIL
+    0: { name: 'Dog' },
+    abc: { name: 'Dog', breed: 'Jindo' }
+}
+
+/**
+ * 문자열 인덱스 시그니처는 모든 속성들의 리턴타입을 자신의 리턴타입으로 통일하도록 강제한다.
+ * 이러한 제약이 발생하는 이유는 앞선 예제의 이유와 같다. 숫자 인덱스 시그니처를 사용한다고 하더라도
+ * 결국은 문자열로 인식이 되기 때문에 해당 속성의 반환 값이 문자열 인덱스 시그니처의 반환 타입과 
+ * 일치하지 않는다면 오류가 발생한다.  
+ */
+interface NumberDictionary {
+    [index: string]: number;
+    length: number;
+    name: string; // FAIL
+}
+
+/**
+ * 하지만 문자열 인덱서의 반환타입으로 유니온 타입을 사용한다면 여러 가지 타입을 사용할 수 있다.
+ */
+interface NumberOrStringDictionary {
+    [index: string]: number | string;
+    length: number;
+    name: string;
+}
+
+/**
+ * 마지막으로 인덱스 시그니처를 읽기 전용 속성으로 만들 수도 있다.
+ * 이렇게 하면 해당 인덱스에 할당을 할 수 없게 된다.
+ */
+interface ReadonlyStringArray {
+    readonly [index: number]: string;
+}
+
+let myReadonlyArray: ReadonlyStringArray = ["Alice", "Bob"];
+myReadonlyArray[2] = "Mallory"; // FAIL
