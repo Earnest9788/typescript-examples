@@ -459,3 +459,76 @@ const BClock: BClockConstructor = class BClock implements BClockInterface {
         console.log("beep beep");
     }
 }
+
+
+
+/******************************
+ * Title: 8. Extending Interfaces
+ * Desc: 인터페이스의 확장
+ *****************************/
+
+/**
+ * 인터페이스는 클래스처럼 서로 확장이 가능하다. 이러한 특성을 이용하면 한 인터페이스의 속성을
+ * 다른 인터페이스에 복사할 수 있으므로 인터페이스를 좀더 유연하게 재사용 가능한 구조로 분리할 수 있다. 
+ */
+interface Shape {
+    color: string;
+}
+
+interface Square extends Shape {
+    sideLength: number;
+}
+
+let square = {} as Square;
+square.color = "blue";
+square.sideLength = 10;
+
+/**
+ * 인터페이스는 동시에 여러 인터페이스를 이용하여 확장할 수 있다.
+ */
+interface PenStroke {
+    penWidth: number;
+}
+
+interface Square2 extends Shape, PenStroke {
+    sideLength: number;
+}
+
+let square2 = {} as Square2;
+square2.color = "blue";
+square2.sideLength = 10;
+square2.penWidth = 5.0;
+
+
+
+/******************************
+ * Title: 9. Hybrid Types
+ * Desc: 
+ *****************************/
+
+/**
+ * 자바스크립트는 동적이고 유연하다. 때문에 앞서 살펴본 여러가지 인터페이스의 특성들을 조합해야만 표현이 가능한 객체도 있다.
+ * 대표적으로 한 객체가 함수와 객체의 기능을 모두 갖고 있는 경우가 있을 수 있다. 다음의 예제를 살펴보자.
+ */
+interface Counter {
+    (start: number): string;
+    interval: number;
+    reset(): void;
+}
+
+function getCounter(): Counter {
+    let counter = function (start: number) {} as Counter;
+    counter.interval = 123;
+    counter.reset = function () {};
+    return counter;
+}
+
+let c = getCounter();
+c(10);
+c.reset();
+c.interval = 5.0;
+
+/**
+ * 외부 라이브러리를 사용할 때, 타입의 형태를 기술하기 위해서 위와 같은 패턴을 사용해야 할 수도 있다.
+ */
+
