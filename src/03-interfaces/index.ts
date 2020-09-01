@@ -532,3 +532,43 @@ c.interval = 5.0;
  * 외부 라이브러리를 사용할 때, 타입의 형태를 기술하기 위해서 위와 같은 패턴을 사용해야 할 수도 있다.
  */
 
+
+
+/******************************
+ * Title: 10. Interfaces Extending Classes
+ * Desc: 
+ *****************************/
+
+/**
+ * 인터페이스가 클래스를 extends할 때 클래스의 구성요소는 상속을 하지만, 해당 클래스의 implement는 상속하지 않는다.
+ * 인터페이스는 베이스 클래스의 private, protected 맴버도 상속을 받지만,
+ * 다시 이러한 경우의 인터페이스를 implement하기 위해서는 베이스 클래스 또는 그 클래스의 하위 클래스를 implement 해야한다.
+ * 
+ * 이러한 특성은 다중 상속 계층을 갖고 있지만 특정 속성을 갖고 있는 서브 클래스에서만 코드가 작동하도록 하고싶은 경우에 유용하다. 
+ */
+class Control {
+    private state: any;
+}
+
+interface SelectableControl extends Control {
+    select(): void;
+}
+
+class Button extends Control implements SelectableControl {
+    select() {}
+}
+
+class TextBox extends Control {
+    select() {}
+}
+
+class ImageControl implements SelectableControl {
+    private state: any;
+    select() {}
+}
+
+/**
+ * 위의 예에서 SelectableControl은 Control 클래스의 모든 private을 포함한 모든 속성을 상속한다.
+ * 'state'는 private 속성이기 때문에 'SelectableControl'을 implement 하기위해서는 'Control'
+ * 클래스의 자손이어야만 한다.
+ */
